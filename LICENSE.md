@@ -1,6 +1,6 @@
-gligneul/LuaWorkshop2018 (c) by Gabriel de Quadros Ligneul
+gligneul/luaworkshop2018 (c) by Gabriel de Quadros Ligneul
 
-gligneul/LuaWorkshop2018 is licensed under a
+gligneul/luaworkshop2018 is licensed under a
 Creative Commons Attribution 3.0 Unported License.
 
 You should have received a copy of the license along with this
