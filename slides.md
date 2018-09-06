@@ -30,8 +30,7 @@ What are our options?
 
 ### Idioms Specific to LuaJIT
 
-For instance, caching global functions local variables in order to gain
-performance.
+For instance, caching global functions in local variables.
 
 ```
 -- Bad
@@ -46,10 +45,9 @@ local function mytan(x)
 end
 ```
 
+---
 
-
-But you shouldn't cache FFI functions to locals. This kind of idioms leads to
-misleading and cargo-cult programming.
+But you shouldn't cache FFI functions to locals!
 
 ```
 -- Good (!)
@@ -68,7 +66,7 @@ end
 
 ### Not Yet Implemented
 
-LuaJIT is not able to compile some of Lua features, hence the performance
+LuaJIT is not able to compile some Lua features, hence the performance
 improvement might not be that good.
 
 - pairs
@@ -82,7 +80,7 @@ improvement might not be that good.
 ### Rewrite it in C
 
 - C-API is great, but...
-- Might be difficult to newcomers
+- Might be difficult for newcomers
 - Requires a lot of effort
 - It is hard to know in advance if it will be worth it
 
@@ -97,12 +95,14 @@ improvement might not be that good.
 Pallene is a companion language for Lua that relies on a static type system and
 ahead-of-time compiler to achieve good performance.  
 
+---
 
+Pallene is an academic research project on programing languages at LabLua by
+Hugo, myself, and Roberto.
 
-Pallene is an academic research project on programing languages at LabLua done
-by Hugo Gualandi and myself with advisory of Roberto Ierusalimschy.
-
-Also check out the original project: [https://github.com/titan-lang/titan](https://github.com/titan-lang/titan)
+Also check out the original project made by Andre, Fabio, Hisham, Hugo, Sérgio,
+and me:  
+[https://github.com/titan-lang/titan](https://github.com/titan-lang/titan)
 
 ---
 
@@ -128,7 +128,7 @@ function sum(arr)
 end
 ```
 
-
+---
 
 For instance, it could be sending e-mails under the hood.
 
@@ -138,8 +138,11 @@ local mt = {
 		return #self.emails
 	end,
 	__index = function(self, i)
-		email.send(self.emails[i])
-		return 1
+		if email.send(self.emails[i]) then
+			return 1
+		else
+			return 0
+		end
 	end,
 }
 ```
@@ -176,10 +179,26 @@ print(array.sum(a))
 
 ---
 
+### Pallene Semantics
+
+Pallene tries to keep the Lua semantics as much as possible.
+For instance, a function won't coerce an integer argument to a float parameter.
+
+```
+-- Pallene Code:
+function add(x: float, y:float): float
+	return x + y
+end
+-- Lua Code:
+local big = 18014398509481984 print(add(big, 1) == big)
+```
+
+---
+
 ### Gradual Guarantee
 
-Pallene keeps the same semantics of Lua, but might raise an type error during
-execution.
+Pallene is not forced to yield a type error if `copy` receives an array of
+strings.
 
 ```
 function copy(xs: {integer}): {integer}
@@ -195,7 +214,7 @@ end
 
 ### Generating Fast Code Ahead Of Time
 
-Pallene specialize each instruction to the given type and bypass the Lua-C API.
+Pallene specializes each instruction to the given type and bypass the Lua-C API.
 
 ```
 int sum(Table *arr)
@@ -214,7 +233,6 @@ int sum(Table *arr)
 
 ### Arrays in Pallene
 
-- The same data structure is manipulated both by Lua and Pallene
 - Pallene uses the same underlying structure that the Lua interpreter does
 - According to the gradual guarantee, Pallene code should either behave like
   the equivalent (untyped) Lua code or raise a type error
@@ -223,8 +241,8 @@ int sum(Table *arr)
 
 ### Array access
 
-The generate code is very specialized when compared to the Lua interpreter
-instruction.
+The generated code is very specialized when compared to what the Lua
+interpreter does.
 
 ```
 lua_Integer pallene_get_integer(Table *arr, int i)
@@ -244,7 +262,7 @@ lua_Integer pallene_get_integer(Table *arr, int i)
 
 ---
 
-### Matrices Multiplication
+### Matrix Multiplication
 
 ![matmul](img/matmul.png)
 
@@ -256,19 +274,19 @@ lua_Integer pallene_get_integer(Table *arr, int i)
 
 ---
 
-### Sieve of Eratosthenes
+### Prime Sieve
 
 ![sieve](img/sieve.png)
 
 ---
 
-### 8 Queens Problem
+### N-Queens Problem
 
 ![queens](img/queens.png)
 
 ---
 
-### Conway Game of Life
+### Conway's Game of Life
 
 ![conway](img/conway.png)
 
@@ -282,11 +300,15 @@ lua_Integer pallene_get_integer(Table *arr, int i)
 
 ## Questions?
 
-This presentation:  
+This presentation  
 [https://gligneul.github.io/luaworkshop2018](https://gligneul.github.io/luaworkshop2018)
 
-Pallene Language:  
+Pallene Language  
 [https://github.com/pallene-lang/pallene](https://github.com/pallene-lang/pallene)
+
+SBLP Paper by Hugo M. Gualandi, Roberto Ierusalimschy, Pallene: A statically
+typed companion language for Lua.  
+[http://www.inf.puc-rio.br/~roberto/docs/pallene-sblp.pdf](http://www.inf.puc-rio.br/~roberto/docs/pallene-sblp.pdf)
 
 Mail me:  
 [gligneul `at` puc.inf-rio.br](mailto:)
